@@ -1,0 +1,72 @@
+{
+  "langchain": {
+    "description": "Uma biblioteca para construir aplicações com LLMs, atuando como um orquestrador central para conectar LLMs a fontes de dados externas.",
+    "documentation_link": "https://python.langchain.com/",
+    "use_cases": [
+      {
+        "name": "RAG (Retrieval-Augmented Generation)",
+        "description": "Permite que o LLM responda perguntas com base em documentos privados (PDFs, TXT, etc.).",
+        "workflow": [
+          "Load: Carregar documentos (ex: PyPDFLoader para PDFs).",
+          "Split: Quebrar documentos em pedaços menores (ex: RecursiveCharacterTextSplitter).",
+          "Embed & Store: Converter os pedaços em vetores e armazená-los em um banco de dados vetorial (ex: ChromaDB para armazenamento local).",
+          "Retrieve: Buscar os pedaços de informação mais relevantes para uma pergunta.",
+          "Generate: Enviar a pergunta e os dados recuperados para o LLM gerar uma resposta."
+        ],
+        "recommended_modules": ["ChatOpenAI", "OpenAIEmbeddings", "RetrievalQA", "PyPDFLoader", "RecursiveCharacterTextSplitter", "Chroma"]
+      },
+      {
+        "name": "Text-to-SQL / Agentes de Banco de Dados",
+        "description": "Permite que o LLM interaja com bancos de dados estruturados (SQL) usando linguagem natural.",
+        "workflow": [
+          "O usuário faz uma pergunta em linguagem natural (ex: 'Quantos clientes novos tivemos ontem?').",
+          "O agente LangChain traduz a pergunta para uma consulta SQL.",
+          "A consulta é executada no banco de dados alvo via SQLAlchemy.",
+          "O resultado da consulta é usado pelo LLM para formular uma resposta em linguagem natural."
+        ],
+        "recommended_modules": ["create_sql_agent", "SQLDatabaseToolkit", "SQLDatabase"]
+      }
+    ]
+  },
+  "faster-whisper": {
+    "description": "Uma reimplementação otimizada do Whisper da OpenAI, projetada para ser mais rápida e consumir menos memória, ideal para execução em CPU.",
+    "documentation_link": "https://github.com/SYSTRAN/faster-whisper",
+    "benefits": [
+      "Até 4 vezes mais rápido que o Whisper original.",
+      "Usa 2 vezes menos memória.",
+      "Excelente performance em CPUs, não necessitando de GPU."
+    ],
+    "recommended_implementation": {
+      "project": "Whisper-FastAPI",
+      "description": "Um servidor web que expõe o faster-whisper através de uma API RESTful, compatível com a API de transcrição da OpenAI.",
+      "reasoning": "É a solução mais direta para criar um serviço de transcrição (STT) auto-hospedado. A compatibilidade com a API da OpenAI permite reutilizar o código existente, apenas alterando a URL base para o serviço local."
+    }
+  },
+  "SQLAlchemy": {
+    "description": "Uma biblioteca Python que fornece um ORM (Object-Relational Mapper) e um toolkit de SQL. Atua como uma camada de abstração universal para se conectar a uma vasta gama de bancos de dados SQL.",
+    "documentation_link": "https://www.sqlalchemy.org/",
+    "role_in_project": "É a ponte entre o agente SQL da LangChain e o banco de dados da aplicação (ex: MySQL, PostgreSQL, Supabase, SQLite). LangChain usa SQLAlchemy para inspecionar o schema do banco, construir consultas e executá-las, sem precisar de código específico para cada tipo de banco.",
+    "connection_examples": {
+      "MySQL": "mysql+pymysql://user:pass@host:port/dbname",
+      "PostgreSQL (Supabase)": "postgresql+psycopg2://user:pass@host:port/postgres",
+      "SQLite": "sqlite:///mydatabase.db"
+    }
+  },
+  "Docker": {
+    "description": "Uma plataforma para desenvolver, enviar e executar aplicações em contêineres.",
+    "documentation_link": "https://docs.docker.com/",
+    "role_in_project": "É a tecnologia recomendada para implantar os serviços de suporte (STT e TTS) de forma isolada e gerenciável.",
+    "usage": [
+      {
+        "service": "Serviço de Transcrição (STT)",
+        "implementation": "Executar o projeto `Whisper-FastAPI` dentro de um contêiner Docker. Isso cria um endpoint de API local e estável para a aplicação principal consumir.",
+        "command": "docker-compose up"
+      },
+      {
+        "service": "Serviço de Text-to-Speech (TTS)",
+        "implementation": "Executar um servidor TTS como o `Piper TTS` dentro de um contêiner Docker. Isso fornece um endpoint local para converter o texto gerado pelo LLM em áudio.",
+        "reasoning": "Containerizar os serviços garante que eles tenham suas próprias dependências e ambientes, simplificando o deploy e evitando conflitos com a aplicação principal."
+      }
+    ]
+  }
+}
